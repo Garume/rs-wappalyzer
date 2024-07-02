@@ -1,0 +1,60 @@
+{
+  "Example": {
+    "description": "A short description of the technology.",
+    "cats": [
+      "1"
+    ],
+    "cookies": {
+      "cookie_name": "Example"
+    },
+    "dom": {
+      "#example-id": {
+        "exists": "",
+        "attributes": {
+          "class": "example-class"
+        },
+        "properties": {
+          "example-property": ""
+        },
+        "text": "Example text content"
+      }
+    },
+    "dns": {
+      "MX": [
+        "example\\.com"
+      ]
+    },
+    "js": {
+      "Example.method": ""
+    },
+    "excludes": "Example",
+    "headers": {
+      "X-Powered-By": "Example"
+    },
+    "html": "<link[^>]example\\.css",
+    "text": "\bexample\b",
+    "css": "\\.example-class",
+    "robots": "Disallow: /unique-path/",
+    "implies": "PHP\\;confidence:50",
+    "requires": "WordPress",
+    "requiresCategory": "Ecommerce",
+    "meta": {
+      "generator": "(?:Example|Another Example)"
+    },
+    "probe": {
+      "/path": ""
+    },
+    "scriptSrc": "example-([0-9.]+)\\.js\\;confidence:50\\;version:\\1",
+    "scripts": "function webpackJsonpCallback\\(data\\) {",
+    "url": "example\\.com",
+    "xhr": "example\\.com",
+    "oss": true,
+    "saas": true,
+    "pricing": [
+      "mid",
+      "freemium",
+      "recurring"
+    ],
+    "website": "https://example.com"
+  }
+}

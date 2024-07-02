@@ -1,0 +1,50 @@
+{
+  "1C-Bitrix": {
+    "cats": [
+      1,
+      6
+    ],
+    "cookies": {
+      "BITRIX_SM_GUEST_ID": "",
+      "BITRIX_SM_LAST_IP": "",
+      "BITRIX_SM_SALE_UID": ""
+    },
+    "description": "1C-Bitrix is a system of web project management, universal software for the creation, support and successful development of corporate websites and online stores.",
+    "headers": {
+      "Set-Cookie": "BITRIX_",
+      "X-Powered-CMS": "Bitrix Site Manager/?([\\d.]+)?\\;version:\\1"
+    },
+    "icon": "1C-Bitrix.svg",
+    "implies": "PHP",
+    "pricing": [
+      "onetime",
+      "mid",
+      "recurring"
+    ],
+    "saas": true,
+    "scriptSrc": "bitrix(?:\\.info/|/js/main/core)",
+    "website": "https://www.1c-bitrix.ru"
+  },
+  "2B Advice": {
+    "cats": [
+      67
+    ],
+    "description": "2B Advice provides a plug-in to manage GDPR cookie consent.",
+    "icon": "2badvice.png",
+    "js": {
+      "BBCookieControler": ""
+    },
+    "saas": true,
+    "scriptSrc": "2badvice-cdn\\.azureedge\\.net",
+    "website": "https://www.2b-advice.com/en/data-privacy-software/cookie-consent-plugin/"
+  },
+  "30namaPlayer": {
+    "cats": [
+      14
+    ],
+    "description": "30namaPlayer is a modified version of Video.js to work with videos on HTML using javascript.",
+    "dom": "section[class*='player30nama']",
+    "icon": "30namaPlayer.png",
+    "website": "https://30nama.com/"
+  }
+}
