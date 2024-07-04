@@ -1,0 +1,86 @@
+use std::str::from_utf8;
+
+use fancy_regex::Regex;
+
+#[derive(Debug)]
+pub struct WappalyzerRegex {
+    pub regex: Regex,
+    pub confidence: u8,
+    pub version_format: Option<String>,
+}
+
+impl WappalyzerRegex {
+    pub fn new(pattern: &str) -> Self {
+        let parts: Vec<&str> = pattern.split("\\;").collect();
+
+        let regex = Regex::new(parts[0]);
+        if regex.is_err() {
+            if cfg!(debug_assertions) {
+                eprintln!("Invalid regex pattern: {}", parts[0]);
+            }
+
+            return WappalyzerRegex {
+                regex: Regex::new("").unwrap(),
+                confidence: 0,
+                version_format: None,
+            };
+        }
+
+        let regex = regex.unwrap();
+
+        let mut confidence = 100;
+        let mut version_format = None;
+
+        for part in parts.iter().skip(1) {
+            if let Some(value) = part.strip_prefix("confidence:") {
+                confidence = value.parse().unwrap_or(confidence);
+            } else if let Some(value) = part.strip_prefix("version:") {
+                version_format = Some(value.to_string());
+            }
+        }
+
+        WappalyzerRegex {
+            regex,
+            confidence,
+            version_format,
+        }
+    }
+
+    pub fn extract_version(&self, input: &str) -> String {
+        if let Some(version_format) = &self.version_format {
+            if let Some(captures) = self.regex.captures(input).unwrap() {
+                let mut result = version_format.clone();
+
+                for i in 1..=captures.len() {
+                    let group = captures
+                        .get(i)
+                        .map_or("", |m| from_utf8(m.as_str().as_bytes()).unwrap());
+                    result = result.replace(&format!("\\{}", i), group);
+                }
+
+                if let Some(index) = result.find('?') {
+                    let rest = &result[(index + 1)..];
+                    let (true_part, false_part) = match rest.find(':') {
+                        Some(colon_index) => (&rest[..colon_index], &rest[(colon_index + 1)..]),
+                        None => (rest, ""),
+                    };
+
+                    return if captures.get(1).is_some() {
+                        true_part.to_string()
+                    } else {
+                        false_part.to_string()
+                    };
+                }
+
+                return result;
+            }
+        }
+        "".to_string()
+    }
+}
+
+impl From<&str> for WappalyzerRegex {
+    fn from(pattern: &str) -> Self {
+        WappalyzerRegex::new(pattern)
+    }
+}
