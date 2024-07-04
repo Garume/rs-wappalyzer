@@ -1,6 +1,6 @@
 use std::str::from_utf8;
 
-use fancy_regex::Regex;
+use fancy_regex::{Captures, Regex};
 
 #[derive(Debug)]
 pub struct WappalyzerRegex {
@@ -46,34 +46,58 @@ impl WappalyzerRegex {
         }
     }
 
-    pub fn extract_version(&self, input: &str) -> String {
+    pub fn extract(&self, input: &str) -> WappalyzerRegexResult {
+        let captures = self.regex.captures(input);
+        match captures {
+            Ok(captures) => match captures {
+                Some(captures) => {
+                    let version = self.extract_version(captures);
+                    WappalyzerRegexResult {
+                        result: true,
+                        version,
+                        confidence: self.confidence,
+                    }
+                }
+                None => WappalyzerRegexResult {
+                    result: false,
+                    version: "".to_string(),
+                    confidence: 0,
+                },
+            },
+            Err(_) => WappalyzerRegexResult {
+                result: false,
+                version: "".to_string(),
+                confidence: 0,
+            },
+        }
+    }
+
+    pub fn extract_version(&self, captures: Captures) -> String {
         if let Some(version_format) = &self.version_format {
-            if let Some(captures) = self.regex.captures(input).unwrap() {
-                let mut result = version_format.clone();
+            let mut result = version_format.clone();
 
-                for i in 1..=captures.len() {
-                    let group = captures
-                        .get(i)
-                        .map_or("", |m| from_utf8(m.as_str().as_bytes()).unwrap());
-                    result = result.replace(&format!("\\{}", i), group);
-                }
-
-                if let Some(index) = result.find('?') {
-                    let rest = &result[(index + 1)..];
-                    let (true_part, false_part) = match rest.find(':') {
-                        Some(colon_index) => (&rest[..colon_index], &rest[(colon_index + 1)..]),
-                        None => (rest, ""),
-                    };
-
-                    return if captures.get(1).is_some() {
-                        true_part.to_string()
-                    } else {
-                        false_part.to_string()
-                    };
-                }
-
-                return result;
+            for i in 1..=captures.len() {
+                let group = captures
+                    .get(i)
+                    .map_or("", |m| from_utf8(m.as_str().as_bytes()).unwrap());
+                result = result.replace(&format!("\\{}", i), group);
             }
+
+            if let Some(index) = result.find('?') {
+                let rest = &result[(index + 1)..];
+                let (true_part, false_part) = match rest.find(':') {
+                    Some(colon_index) => (&rest[..colon_index], &rest[(colon_index + 1)..]),
+                    None => (rest, ""),
+                };
+
+                return if captures.get(1).is_some() {
+                    true_part.to_string()
+                } else {
+                    false_part.to_string()
+                };
+            }
+
+            return result;
         }
         "".to_string()
     }
@@ -83,4 +107,10 @@ impl From<&str> for WappalyzerRegex {
     fn from(pattern: &str) -> Self {
         WappalyzerRegex::new(pattern)
     }
+}
+
+pub struct WappalyzerRegexResult {
+    pub result: bool,
+    pub version: String,
+    pub confidence: u8,
 }

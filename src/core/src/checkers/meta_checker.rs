@@ -17,12 +17,12 @@ impl Checker for MetaChecker {
                 if key == pattern.0 {
                     let regex = pattern.1;
                     for value in values {
-                        let result = regex.regex.is_match(value).unwrap();
-                        if result {
+                        let result = regex.extract(value.as_ref());
+                        if result.result {
                             return Some(FingerPrintMeta {
                                 name: technology.name.clone(),
-                                version: pattern.1.extract_version(value),
-                                confidence: pattern.1.confidence as i32,
+                                version: result.version,
+                                confidence: result.confidence as i32,
                             });
                         }
                     }

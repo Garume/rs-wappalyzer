@@ -28,12 +28,12 @@ impl Checker for CookieChecker {
         for pattern in patterns {
             if let Some(cookie) = cookies.get(pattern.0) {
                 let regex = pattern.1;
-                let result = regex.regex.is_match(cookie.as_ref()).unwrap();
-                if result {
+                let result = regex.extract(cookie.as_ref());
+                if result.result {
                     return Some(FingerPrintMeta {
                         name: technology.name.clone(),
-                        version: regex.extract_version(cookie),
-                        confidence: regex.confidence as i32,
+                        version: result.version,
+                        confidence: result.confidence as i32,
                     });
                 }
             }

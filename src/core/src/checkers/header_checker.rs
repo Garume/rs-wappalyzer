@@ -18,12 +18,12 @@ impl Checker for HeaderChecker {
         for pattern in patterns {
             if let Some(header) = headers.get(pattern.0) {
                 let regex = pattern.1;
-                let result = regex.regex.is_match(header.to_str().unwrap()).unwrap();
-                if result {
+                let result = regex.extract(header.to_str().unwrap());
+                if result.result {
                     return Some(FingerPrintMeta {
                         name: technology.name.clone(),
-                        version: regex.extract_version(header.to_str().unwrap()),
-                        confidence: regex.confidence as i32,
+                        version: result.version,
+                        confidence: result.confidence as i32,
                     });
                 }
             }

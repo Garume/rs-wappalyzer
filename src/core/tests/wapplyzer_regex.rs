@@ -32,7 +32,7 @@ fn wapplyzer_regex_create() {
 
     for test in tests {
         let regex = WappalyzerRegex::new(test.input);
-        assert_eq!(regex.regex.as_str(), test.expected_regex);
+        assert_eq!(regex.regex.to_string(), test.expected_regex);
         assert_eq!(regex.confidence, test.expected_confidence);
         assert_eq!(regex.version_format, test.expected_version_format);
     }
@@ -86,7 +86,8 @@ fn wapplyzer_regex_extract_version() {
 
     for test in tests {
         let regex = WappalyzerRegex::new(test.pattern);
-        let version = regex.extract_version(test.input);
+        let captures = regex.regex.captures(test.input).unwrap();
+        let version = regex.extract_version(captures.unwrap());
         assert_eq!(version, test.expected_version);
     }
 }

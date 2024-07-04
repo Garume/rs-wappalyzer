@@ -16,12 +16,12 @@ impl Checker for ScriptSrcChecker {
                 let (key, values) = node;
                 if key == "src" {
                     for value in values {
-                        let result = pattern.regex.is_match(value).unwrap();
-                        if result {
+                        let result = pattern.extract(value.as_ref());
+                        if result.result {
                             return Some(FingerPrintMeta {
                                 name: technology.name.clone(),
-                                version: pattern.extract_version(value),
-                                confidence: pattern.confidence as i32,
+                                version: result.version,
+                                confidence: result.confidence as i32,
                             });
                         }
                     }

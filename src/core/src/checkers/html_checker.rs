@@ -12,25 +12,14 @@ impl Checker for HtmlChecker {
         let patterns = &technology.html;
 
         for pattern in patterns {
-            let result = pattern.regex.is_match(body);
+            let result = pattern.extract(body);
 
-            match result {
-                Ok(result) => {
-                    if result {
-                        return Some(FingerPrintMeta {
-                            name: technology.name.clone(),
-                            version: pattern.extract_version(body),
-                            confidence: pattern.confidence as i32,
-                        });
-                    }
-                }
-                Err(e) => {
-                    if cfg!(debug_assertions) {
-                        eprintln!("Error matching regex: {}", e);
-                        eprintln!("Regex: {:?}", pattern.regex);
-                    }
-                    continue;
-                }
+            if result.result {
+                return Some(FingerPrintMeta {
+                    name: technology.name.clone(),
+                    version: result.version,
+                    confidence: result.confidence as i32,
+                });
             }
         }
 

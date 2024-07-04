@@ -75,10 +75,35 @@ fn bench_wappalyzer(c: &mut Criterion) {
     });
 }
 
+fn bench_only_analyze(c: &mut Criterion) {
+    let rt = Runtime::new().unwrap();
+    c.bench_function("only_analyze", move |b| {
+        b.iter(|| {
+            let mut wappalyzer = Wappalyzer::new();
+            let files = fs::read_dir(
+                "C:/Users/user/RustroverProjects/rs-wappalyzer/src/core/benches/latest",
+            )
+            .unwrap();
+            for file in files {
+                let path = file.unwrap().path();
+                let json = fs::read_to_string(path).unwrap();
+                wappalyzer.load_from_json(json.as_str());
+            }
+
+            rt.block_on(async {
+                let webpage = Webpage::from_url("http://example.com").await.unwrap();
+                let _ = wappalyzer.analyze(&webpage);
+            });
+        })
+    });
+}
+
 criterion_group!(
     benches,
     bench_deserialize_technologies,
-    bench_load_technologies
+    bench_load_technologies,
+    bench_only_analyze,
+    bench_wappalyzer
 );
 
 // main関数を用意
