@@ -46,29 +46,20 @@ impl WappalyzerRegex {
         }
     }
 
-    pub fn extract(&self, input: &str) -> WappalyzerRegexResult {
+    pub fn extract(&self, input: &str) -> Option<WappalyzerRegexResult> {
         let captures = self.regex.captures(input);
         match captures {
             Ok(captures) => match captures {
                 Some(captures) => {
                     let version = self.extract_version(captures);
-                    WappalyzerRegexResult {
-                        result: true,
+                    Some(WappalyzerRegexResult {
                         version,
                         confidence: self.confidence,
-                    }
+                    })
                 }
-                None => WappalyzerRegexResult {
-                    result: false,
-                    version: "".to_string(),
-                    confidence: 0,
-                },
+                None => None,
             },
-            Err(_) => WappalyzerRegexResult {
-                result: false,
-                version: "".to_string(),
-                confidence: 0,
-            },
+            Err(_) => None,
         }
     }
 
@@ -110,7 +101,6 @@ impl From<&str> for WappalyzerRegex {
 }
 
 pub struct WappalyzerRegexResult {
-    pub result: bool,
     pub version: String,
     pub confidence: u8,
 }

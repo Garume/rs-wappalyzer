@@ -1,8 +1,11 @@
+use std::collections::HashSet;
+
 use rayon::prelude::*;
 
 use crate::checker::{
     Checker, CookieChecker, HeaderChecker, HtmlChecker, MetaChecker, ScriptSrcChecker,
 };
+use crate::finger_print::{FingerPrint, FingerPrintMeta};
 use crate::technology::TechnologyCollection;
 use crate::webpage::Webpage;
 
@@ -16,7 +19,7 @@ impl Wappalyzer {
         Wappalyzer {
             technologies: TechnologyCollection::new(),
             checkers: vec![
-                Box::new(CookieChecker {}),
+                Box::new(CookieChecker::new()),
                 Box::new(HeaderChecker {}),
                 Box::new(HtmlChecker {}),
                 Box::new(MetaChecker {}),
@@ -30,23 +33,33 @@ impl Wappalyzer {
         self.technologies.add_collection(technologies);
     }
 
-    pub fn analyze(&self, page: &Webpage) -> FingerPrint {
-        let mut finger_print = FingerPrint { data: Vec::new() };
-
-        for technology in &self.technologies.data {
-            for checker in &self.checkers {
-                let result = checker.check(page, technology);
-                if let Some(meta) = result {
-                    finger_print.data.push(meta);
-                }
-            }
+    pub fn analyze(&mut self, page: &Webpage) -> FingerPrint {
+        for checker in self.checkers.iter_mut() {
+            checker.prepare(page);
         }
 
+        let data: HashSet<FingerPrintMeta> = self
+            .technologies
+            .data
+            .iter()
+            .flat_map(|technology| {
+                self.checkers
+                    .iter()
+                    .filter_map(|checker| checker.check(page, technology))
+            })
+            .collect();
+
+        let mut finger_print = FingerPrint { data };
+        finger_print.analyze_implies(&self.technologies);
         finger_print
     }
 
-    pub fn analyze_parallel(&self, page: &Webpage) -> FingerPrint {
-        let finger_prints: Vec<FingerPrintMeta> = self
+    pub fn analyze_parallel(&mut self, page: &Webpage) -> FingerPrint {
+        for checker in self.checkers.iter_mut() {
+            checker.prepare(page);
+        }
+
+        let data: HashSet<FingerPrintMeta> = self
             .technologies
             .data
             .par_iter()
@@ -57,22 +70,10 @@ impl Wappalyzer {
             })
             .collect();
 
-        FingerPrint {
-            data: finger_prints,
-        }
+        let mut finger_print = FingerPrint { data };
+        finger_print.analyze_implies(&self.technologies);
+        finger_print
     }
-}
-
-#[derive(Debug)]
-pub struct FingerPrint {
-    pub data: Vec<FingerPrintMeta>,
-}
-
-#[derive(Debug)]
-pub struct FingerPrintMeta {
-    pub name: String,
-    pub version: String,
-    pub confidence: i32,
 }
 
 #[cfg(test)]

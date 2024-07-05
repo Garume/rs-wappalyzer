@@ -1,10 +1,11 @@
+pub use finger_print::FingerPrint;
 pub use technology::Technology;
-pub use wappalyzer::FingerPrint;
 pub use wappalyzer::Wappalyzer;
 pub use wapplyzer_regex::WappalyzerRegex;
 pub use webpage::Webpage;
 
 pub mod checkers;
+mod finger_print;
 pub mod technology;
 pub mod wappalyzer;
 pub mod wapplyzer_regex;

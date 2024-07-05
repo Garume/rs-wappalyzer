@@ -49,6 +49,7 @@ pub struct Technology {
     pub html: Vec<WappalyzerRegex>,
     pub script_src: Vec<WappalyzerRegex>,
     pub meta: HashMap<String, WappalyzerRegex>,
+    pub implies: Vec<String>,
 }
 
 impl Technology {
@@ -61,6 +62,7 @@ impl Technology {
             html: Vec::new(),
             script_src: Vec::new(),
             meta: HashMap::new(),
+            implies: Vec::new(),
         }
     }
 }
@@ -152,6 +154,10 @@ pub struct TechnologyCollection {
 impl TechnologyCollection {
     pub fn new() -> Self {
         TechnologyCollection { data: Vec::new() }
+    }
+
+    pub fn get(&self, name: &str) -> Option<&Technology> {
+        self.data.iter().find(|technology| technology.name == name)
     }
 
     pub fn add_item(&mut self, technology: Technology) {
@@ -262,6 +268,15 @@ impl TechnologyCollection {
                     HashMap::new()
                 };
 
+                let implies: Vec<String> = if let Some(implies) = &technology_json.implies {
+                    match implies {
+                        StringUnion::String(implies) => vec![implies.clone()],
+                        StringUnion::Vec(implies) => implies.clone(),
+                    }
+                } else {
+                    vec![]
+                };
+
                 Technology {
                     name: name.clone(),
                     headers,
@@ -270,6 +285,7 @@ impl TechnologyCollection {
                     js,
                     script_src,
                     meta,
+                    implies,
                 }
             })
             .collect()
