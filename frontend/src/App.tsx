@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import {invoke} from '@tauri-apps/api/tauri';
 import {
     AppBar,
     Avatar,
@@ -7,6 +6,7 @@ import {
     Button,
     CircularProgress,
     Container,
+    Input,
     List,
     ListItem,
     ListItemAvatar,
@@ -16,6 +16,28 @@ import {
     Toolbar,
     Typography
 } from '@mui/material';
+
+// 環境変数に基づいて条件分岐
+const isTauri = import.meta.env.VITE_BUILD_TARGET === 'tauri';
+
+let analyzeWebsite: (url: string, jsonData: string[]) => Promise<any>;
+
+if (isTauri) {
+    // Tauri用のコード
+    import('@tauri-apps/api/tauri').then(({invoke}) => {
+        analyzeWebsite = async (url: string, jsons: string[]) => {
+            return await invoke('web_analyze', {url, jsons});
+        };
+    });
+} else {
+    // WASM用のコード
+    import('./wasm/src_wasm').then((module) => {
+        module.default().then(() => console.log("WASM initialized"));
+        analyzeWebsite = async (url: string, jsons: string[]) => {
+            return await module.web_analyze(url, jsons);
+        };
+    });
+}
 
 interface FingerPrintMeta {
     name: string;
@@ -33,12 +55,33 @@ const App: React.FC = () => {
     const [result, setResult] = useState<FingerPrint | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [jsonData, setJsonData] = useState<string[]>([]);
 
-    const analyzeWebsite = async () => {
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (files) {
+            const filePromises = Array.from(files).map((file) => {
+                return new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        resolve(e.target?.result as string);
+                    };
+                    reader.onerror = reject;
+                    reader.readAsText(file);
+                });
+            });
+
+            Promise.all(filePromises)
+                .then((data) => setJsonData(data))
+                .catch((error) => console.error("Failed to read files:", error));
+        }
+    };
+
+    const handleAnalyze = async () => {
         setError(null);
         setLoading(true);
         try {
-            const response = await invoke<FingerPrint>('web_analyze', {url});
+            const response = await analyzeWebsite(url, jsonData);
             setResult(response);
         } catch (e) {
             setError('Failed to analyze the website.');
@@ -47,7 +90,6 @@ const App: React.FC = () => {
             setLoading(false);
         }
     };
-
 
     return (
         <Container maxWidth="sm">
@@ -69,7 +111,10 @@ const App: React.FC = () => {
                         margin="normal"
                     />
                     <Box my={2}>
-                        <Button variant="contained" color="primary" onClick={analyzeWebsite} disabled={loading}>
+                        <Input type="file" inputProps={{multiple: true}} onChange={handleFileChange}/>
+                    </Box>
+                    <Box my={2}>
+                        <Button variant="contained" color="primary" onClick={handleAnalyze} disabled={loading}>
                             Analyze
                         </Button>
                     </Box>

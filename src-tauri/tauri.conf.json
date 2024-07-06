@@ -1,11 +1,11 @@
 {
   "build": {
     "beforeBuildCommand": {
-      "script": "pnpm run build",
+      "script": "pnpm run build:tauri",
       "cwd": "../frontend"
     },
     "beforeDevCommand": {
-      "script": "pnpm run dev",
+      "script": "pnpm run dev:tauri",
       "cwd": "../frontend"
     },
     "devPath": "http://localhost:5173",

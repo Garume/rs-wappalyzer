@@ -24,15 +24,9 @@ enum AnalyzeError {
 }
 
 #[tauri::command]
-async fn web_analyze(url: String) -> Result<FingerPrint, AnalyzeError> {
+async fn web_analyze(url: String, jsons: Vec<String>) -> Result<FingerPrint, AnalyzeError> {
     let mut wappalyzer = wappalyzer_core::Wappalyzer::new();
-    let folder_path = "C:/Users/user/RustroverProjects/rs-wappalyzer/src/core/benches/latest";
-    let files = std::fs::read_dir(folder_path).map_err(|_| AnalyzeError::ReadDirError())?;
-
-    for file in files {
-        let file = file.map_err(|_| AnalyzeError::ReadDirError())?;
-        let path = file.path();
-        let json = std::fs::read_to_string(path).map_err(|_| AnalyzeError::ReadFileError())?;
+    for json in jsons {
         wappalyzer.load_from_json(json.as_str());
     }
 
