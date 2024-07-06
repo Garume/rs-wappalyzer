@@ -1,17 +1,20 @@
 use std::collections::HashSet;
 
+use serde::{Deserialize, Serialize};
+
 use crate::technology::TechnologyCollection;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct FingerPrint {
     pub data: HashSet<FingerPrintMeta>,
 }
 
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
 pub struct FingerPrintMeta {
     pub name: String,
     pub version: String,
     pub confidence: i32,
+    pub icon: Option<String>,
 }
 
 impl FingerPrint {
@@ -29,6 +32,7 @@ impl FingerPrint {
                         name: imply.clone(),
                         version: "".to_string(),
                         confidence: 100,
+                        icon: technology.icon.clone(),
                     });
                 }
             }

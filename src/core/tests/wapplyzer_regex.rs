@@ -1,4 +1,4 @@
-use core::wapplyzer_regex::WappalyzerRegex;
+use wappalyzer_core::WappalyzerRegex;
 
 #[test]
 fn wapplyzer_regex_create() {

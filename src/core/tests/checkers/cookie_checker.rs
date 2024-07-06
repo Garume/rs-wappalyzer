@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use core::{Technology, Webpage};
-use core::checker::{Checker, CookieChecker};
+use wappalyzer_core::{Technology, Webpage};
+use wappalyzer_core::checker::{Checker, CookieChecker};
 
 #[test]
 fn cookie_checker_works() {

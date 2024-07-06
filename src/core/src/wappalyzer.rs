@@ -43,9 +43,18 @@ impl Wappalyzer {
             .data
             .iter()
             .flat_map(|technology| {
-                self.checkers
-                    .iter()
-                    .filter_map(|checker| checker.check(page, technology))
+                self.checkers.iter().filter_map(|checker| {
+                    if let Some(result) = checker.check(page, technology) {
+                        Some(FingerPrintMeta {
+                            name: technology.name.clone(),
+                            version: result.version,
+                            confidence: result.confidence,
+                            icon: technology.icon.clone(),
+                        })
+                    } else {
+                        None
+                    }
+                })
             })
             .collect();
 
@@ -64,9 +73,18 @@ impl Wappalyzer {
             .data
             .par_iter()
             .flat_map(|technology| {
-                self.checkers
-                    .par_iter()
-                    .filter_map(|checker| checker.check(page, technology))
+                self.checkers.par_iter().filter_map(|checker| {
+                    if let Some(result) = checker.check(page, technology) {
+                        Some(FingerPrintMeta {
+                            name: technology.name.clone(),
+                            version: result.version,
+                            confidence: result.confidence,
+                            icon: technology.icon.clone(),
+                        })
+                    } else {
+                        None
+                    }
+                })
             })
             .collect();
 

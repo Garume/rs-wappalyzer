@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use core::{Technology, Webpage};
-use core::checker::{Checker, HeaderChecker};
+use wappalyzer_core::{Technology, Webpage};
+use wappalyzer_core::checker::{Checker, HeaderChecker};
 
 #[test]
 fn checker_works() {

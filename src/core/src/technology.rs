@@ -50,6 +50,7 @@ pub struct Technology {
     pub script_src: Vec<WappalyzerRegex>,
     pub meta: HashMap<String, WappalyzerRegex>,
     pub implies: Vec<String>,
+    pub icon: Option<String>,
 }
 
 impl Technology {
@@ -63,6 +64,7 @@ impl Technology {
             script_src: Vec::new(),
             meta: HashMap::new(),
             implies: Vec::new(),
+            icon: None,
         }
     }
 }
@@ -277,6 +279,12 @@ impl TechnologyCollection {
                     vec![]
                 };
 
+                let icon = if let Some(icon) = &technology_json.icon {
+                    Some(icon.clone())
+                } else {
+                    None
+                };
+
                 Technology {
                     name: name.clone(),
                     headers,
@@ -286,6 +294,7 @@ impl TechnologyCollection {
                     script_src,
                     meta,
                     implies,
+                    icon,
                 }
             })
             .collect()

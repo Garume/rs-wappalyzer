@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use core::{Technology, Webpage};
-use core::checker::{Checker, MetaChecker};
+use wappalyzer_core::{Technology, Webpage};
+use wappalyzer_core::checker::{Checker, MetaChecker};
 
 fn create_meta_node(name: &str, content: &str) -> HashMap<String, Vec<String>> {
     let mut node = HashMap::new();

@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
-use core::wappalyzer::Wappalyzer;
-use core::webpage::Webpage;
+use wappalyzer_core::{Wappalyzer, Webpage};
 
 #[test]
 fn wappalyzer_latest() {

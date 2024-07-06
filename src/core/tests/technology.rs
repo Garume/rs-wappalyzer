@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use core::technology::{DomComplex, DomElement, TechnologyJson};
+use wappalyzer_core::technology::{DomComplex, DomElement, TechnologyJson};
 
 #[test]
 fn deserialize_example_technology() {

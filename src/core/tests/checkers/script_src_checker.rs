@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use core::{Technology, WappalyzerRegex, Webpage};
-use core::checker::{Checker, ScriptSrcChecker};
+use wappalyzer_core::{Technology, WappalyzerRegex, Webpage};
+use wappalyzer_core::checker::{Checker, ScriptSrcChecker};
 
 fn create_script_node(src: &str) -> HashMap<String, Vec<String>> {
     let mut node = HashMap::new();

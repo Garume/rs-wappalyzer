@@ -1,5 +1,5 @@
-use core::{Technology, Webpage};
-use core::checker::{Checker, HtmlChecker};
+use wappalyzer_core::{Technology, Webpage};
+use wappalyzer_core::checker::{Checker, HtmlChecker};
 
 #[test]
 fn checker_works() {

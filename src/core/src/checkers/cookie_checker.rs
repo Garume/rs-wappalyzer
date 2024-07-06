@@ -2,8 +2,7 @@ use std::collections::HashMap;
 
 use reqwest::header::SET_COOKIE;
 
-use crate::checkers::checker::Checker;
-use crate::finger_print::FingerPrintMeta;
+use crate::checkers::checker::{Checker, CheckResult};
 use crate::technology::Technology;
 use crate::webpage::Webpage;
 
@@ -36,7 +35,7 @@ impl Checker for CookieChecker {
         self.already_prepared = true;
     }
 
-    fn check(&self, _: &Webpage, technology: &Technology) -> Option<FingerPrintMeta> {
+    fn check(&self, _: &Webpage, technology: &Technology) -> Option<CheckResult> {
         if !self.already_prepared {
             panic!("Checker not prepared");
         }
@@ -46,8 +45,7 @@ impl Checker for CookieChecker {
         for (key, regex) in patterns {
             if let Some(cookie) = self.cookies.get(key) {
                 if let Some(result) = regex.extract(cookie.as_ref()) {
-                    return Some(FingerPrintMeta {
-                        name: technology.name.clone(),
+                    return Some(CheckResult {
                         version: result.version,
                         confidence: result.confidence as i32,
                     });

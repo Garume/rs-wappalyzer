@@ -16,9 +16,9 @@ pub struct Webpage {
 impl Webpage {
     pub async fn from_url(url: &str) -> Result<Self, Error> {
         let client = Client::new();
-        let response = client.get(url).send().await.unwrap();
+        let response = client.get(url).send().await?;
         let headers = response.headers().clone();
-        let body = response.text().await.unwrap();
+        let body = response.text().await?;
 
         let dom = parse_document(RcDom::default(), Default::default()).one(body.clone());
 
