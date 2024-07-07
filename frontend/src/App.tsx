@@ -16,28 +16,7 @@ import {
     Toolbar,
     Typography
 } from '@mui/material';
-
-// 環境変数に基づいて条件分岐
-const isTauri = import.meta.env.VITE_BUILD_TARGET === 'tauri';
-
-let analyzeWebsite: (url: string, jsonData: string[]) => Promise<any>;
-
-if (isTauri) {
-    // Tauri用のコード
-    import('@tauri-apps/api/tauri').then(({invoke}) => {
-        analyzeWebsite = async (url: string, jsons: string[]) => {
-            return await invoke('web_analyze', {url, jsons});
-        };
-    });
-} else {
-    // WASM用のコード
-    import('./wasm/src_wasm').then((module) => {
-        module.default().then(() => console.log("WASM initialized"));
-        analyzeWebsite = async (url: string, jsons: string[]) => {
-            return await module.web_analyze(url, jsons);
-        };
-    });
-}
+import {invoke} from "@tauri-apps/api/tauri";
 
 interface FingerPrintMeta {
     name: string;
@@ -81,7 +60,7 @@ const App: React.FC = () => {
         setError(null);
         setLoading(true);
         try {
-            const response = await analyzeWebsite(url, jsonData);
+            const response = await invoke<FingerPrint>('web_analyze', {url, jsons: jsonData});
             setResult(response);
         } catch (e) {
             setError('Failed to analyze the website.');
